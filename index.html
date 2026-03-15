@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나의 티칭 페르소나 진단기</title>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FFF8F0;
+    --blush: #FFCDD2;
+    --rose: #F48FB1;
+    --peach: #FFCCBC;
+    --lavender: #E1BEE7;
+    --mint: #B2EBF2;
+    --sage: #C8E6C9;
+    --yellow: #FFF9C4;
+    --text-dark: #3E2723;
+    --text-mid: #5D4037;
+    --text-light: #8D6E63;
+    --card-shadow: 0 8px 32px rgba(180,100,100,0.10);
+    --border-radius: 20px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: linear-gradient(135deg, #FFF0F5 0%, #FFF8F0 40%, #F0F8FF 100%);
+    min-height: 100vh;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--text-dark);
+  }
+
+  /* SPLASH */
+  #splash {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 40px 20px; text-align: center;
+    animation: fadeIn 0.8s ease;
+  }
+  .splash-deco {
+    font-size: 56px; margin-bottom: 16px; animation: bounce 2s infinite;
+  }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  .splash-title {
+    font-family: 'Gowun Batang', serif;
+    font-size: clamp(24px, 6vw, 40px);
+    color: var(--text-dark);
+    line-height: 1.4;
+    margin-bottom: 12px;
+  }
+  .splash-sub {
+    font-size: 15px; color: var(--text-light); margin-bottom: 40px; line-height: 1.7;
+  }
+  .tag-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 40px; }
+  .tag {
+    padding: 6px 16px; border-radius: 30px; font-size: 13px; font-weight: 500;
+    border: 1.5px solid rgba(0,0,0,0.08);
+  }
+  .tag-pink { background: #FFE4EE; color: #C2185B; }
+  .tag-mint { background: #E0F7FA; color: #00838F; }
+  .tag-lav  { background: #EDE7F6; color: #6A1B9A; }
+  .tag-peach { background: #FFF3E0; color: #E65100; }
+  .tag-sage  { background: #F1F8E9; color: #2E7D32; }
+  .btn-start {
+    background: linear-gradient(135deg, #F48FB1, #CE93D8);
+    color: white; border: none; border-radius: 50px;
+    padding: 18px 56px; font-size: 18px; font-weight: 700;
+    cursor: pointer; box-shadow: 0 6px 24px rgba(244,143,177,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .btn-start:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(244,143,177,0.5); }
+  .splash-note { margin-top: 20px; font-size: 13px; color: #B0A0A0; }
+
+  /* QUIZ */
+  #quiz { display: none; max-width: 680px; margin: 0 auto; padding: 30px 20px; animation: fadeIn 0.5s ease; }
+  .progress-wrap { margin-bottom: 28px; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-light); margin-bottom: 8px; }
+  .progress-bar-bg { background: #F3E5F5; border-radius: 10px; height: 10px; overflow: hidden; }
+  .progress-bar-fill {
+    height: 100%; background: linear-gradient(90deg, #F48FB1, #CE93D8);
+    border-radius: 10px; transition: width 0.4s ease;
+  }
+  .page-title {
+    font-family: 'Gowun Batang', serif;
+    font-size: 20px; color: var(--text-mid); margin-bottom: 24px; text-align: center;
+  }
+  .question-card {
+    background: white; border-radius: var(--border-radius);
+    padding: 24px; margin-bottom: 18px;
+    box-shadow: var(--card-shadow); border: 1.5px solid #FFF0F5;
+    animation: fadeIn 0.4s ease;
+  }
+  .q-num { font-size: 11px; font-weight: 700; color: #F06292; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .q-text { font-size: 15px; line-height: 1.7; color: var(--text-dark); margin-bottom: 18px; }
+  .scale-row { display: flex; align-items: center; gap: 0; }
+  .scale-label { font-size: 11px; color: var(--text-light); width: 80px; line-height: 1.3; }
+  .scale-label:last-child { text-align: right; }
+  .scale-btns { display: flex; gap: 8px; flex: 1; justify-content: center; }
+  .scale-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 2px solid #F3E5F5; background: white;
+    cursor: pointer; font-size: 12px; font-weight: 700;
+    color: #BDBDBD; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .scale-btn:hover { border-color: #F48FB1; color: #F48FB1; transform: scale(1.1); }
+  .scale-btn.selected {
+    background: linear-gradient(135deg, #F48FB1, #CE93D8);
+    border-color: transparent; color: white;
+    box-shadow: 0 3px 10px rgba(244,143,177,0.4);
+    transform: scale(1.15);
+  }
+  .quiz-nav { display: flex; gap: 12px; justify-content: center; margin-top: 28px; }
+  .btn-nav {
+    padding: 14px 36px; border-radius: 50px; border: none;
+    font-size: 15px; font-weight: 700; cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s;
+  }
+  .btn-prev { background: #F5F5F5; color: var(--text-light); }
+  .btn-prev:hover { background: #EEE; }
+  .btn-next {
+    background: linear-gradient(135deg, #F48FB1, #CE93D8);
+    color: white; box-shadow: 0 4px 16px rgba(244,143,177,0.4);
+  }
+  .btn-next:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(244,143,177,0.5); }
+  .btn-next:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* RESULT */
+  #result { display: none; max-width: 800px; margin: 0 auto; padding: 30px 20px; animation: fadeIn 0.6s ease; }
+  .result-header { text-align: center; margin-bottom: 40px; }
+  .result-emoji { font-size: 64px; margin-bottom: 16px; }
+  .result-mbti {
+    font-family: 'Gowun Batang', serif;
+    font-size: clamp(36px, 10vw, 60px);
+    background: linear-gradient(135deg, #F48FB1, #CE93D8, #80DEEA);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 8px; margin-bottom: 8px;
+  }
+  .result-type-name {
+    font-size: 20px; font-weight: 700; color: var(--text-dark); margin-bottom: 12px;
+  }
+  .result-comment {
+    font-size: 15px; color: var(--text-mid); line-height: 1.8;
+    background: linear-gradient(135deg, #FFF0F5, #F3E5F5);
+    border-radius: 16px; padding: 20px 24px; margin-bottom: 32px;
+    border-left: 4px solid #F48FB1;
+  }
+
+  /* PERSONA CARD */
+  .section-title {
+    font-family: 'Gowun Batang', serif;
+    font-size: 22px; color: var(--text-dark); margin-bottom: 20px; text-align: center;
+  }
+  .persona-card {
+    border-radius: 24px; padding: 28px 24px; margin-bottom: 32px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.10);
+  }
+  .persona-badge {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px; padding: 5px 14px; border-radius: 30px;
+    margin-bottom: 16px; background: rgba(255,255,255,0.6); color: var(--text-mid);
+  }
+  .persona-emoji { font-size: 48px; margin-bottom: 12px; display: block; }
+  .persona-name { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+  .persona-desc { font-size: 14px; line-height: 1.8; opacity: 0.85; }
+  .persona-traits { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .persona-trait { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.5); }
+
+  /* ROUTINE TABLE */
+  .routine-wrap { margin-bottom: 32px; overflow-x: auto; }
+  .routine-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 13px; border-radius: 20px; overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    min-width: 540px;
+  }
+  .routine-table th {
+    padding: 14px 12px; font-weight: 700; font-size: 12px;
+    text-align: center; letter-spacing: 0.5px;
+  }
+  .routine-table th.stage-header {
+    background: linear-gradient(135deg, #F48FB1, #CE93D8);
+    color: white; width: 110px;
+  }
+  .routine-table th.persona-col { background: #FFF0F5; color: var(--text-mid); }
+  .routine-table td {
+    padding: 13px 14px; border-bottom: 1px solid #FFF0F5;
+    vertical-align: top; line-height: 1.6; text-align: center;
+    font-size: 13px;
+  }
+  .routine-table td.stage-cell {
+    font-weight: 700; font-size: 12px; background: #FFF8FF;
+    color: var(--text-mid); text-align: center; vertical-align: middle;
+  }
+  .routine-table tr:last-child td { border-bottom: none; }
+  .routine-table tr:nth-child(even) td { background: #FFFBFF; }
+  .highlight-col { background: #FFF0F5 !important; font-weight: 600; color: #C2185B; }
+  .stage-icon { font-size: 16px; display: block; margin-bottom: 2px; }
+
+  /* TIPS */
+  .tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 32px; }
+  @media(max-width:540px) { .tips-grid { grid-template-columns: 1fr; } }
+  .tip-card {
+    background: white; border-radius: 16px; padding: 18px 16px;
+    box-shadow: var(--card-shadow); border-top: 3px solid;
+  }
+  .tip-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .tip-card p { font-size: 12px; color: var(--text-light); line-height: 1.7; }
+
+  .btn-retry {
+    display: block; width: 100%; max-width: 320px; margin: 10px auto 0;
+    padding: 16px; border-radius: 50px; border: 2px solid #F48FB1;
+    background: white; color: #F48FB1; font-size: 16px; font-weight: 700;
+    cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-retry:hover { background: #FFF0F5; }
+
+  @media(max-width:480px) {
+    .scale-label { width: 60px; font-size: 10px; }
+    .scale-btn { width: 30px; height: 30px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-deco">🌸</div>
+  <h1 class="splash-title">나의 티칭 페르소나<br>&amp; 수업 루틴 진단기</h1>
+  <p class="splash-sub">나는 어떤 강사일까요?<br>30개 문항으로 나의 티칭 스타일과 맞춤 수업 루틴을 알아보세요!</p>
+  <div class="tag-row">
+    <span class="tag tag-pink">💄 예쁨주의</span>
+    <span class="tag tag-mint">😄 유머주의</span>
+    <span class="tag tag-lav">🌿 소심함주의</span>
+    <span class="tag tag-peach">💛 공감주의</span>
+    <span class="tag tag-sage">📚 교육주의</span>
+  </div>
+  <button class="btn-start" onclick="startQuiz()">진단 시작하기 ✨</button>
+  <p class="splash-note">소요 시간 약 5분 · 총 30문항 · 5점 척도</p>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz">
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span id="progress-text">1 / 6 페이지</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+  <p class="page-title" id="page-title">📝 수업 준비 & 계획 스타일</p>
+  <div id="questions-container"></div>
+  <div class="quiz-nav">
+    <button class="btn-nav btn-prev" id="btn-prev" onclick="prevPage()" style="display:none">← 이전</button>
+    <button class="btn-nav btn-next" id="btn-next" onclick="nextPage()">다음 →</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="result"></div>
+
+<script>
+// ============================================================
+// QUESTIONS DATA
+// ============================================================
+const QUESTIONS = [
+  // PAGE 1: E/I
+  { id:1, dim:'EI', dir:'E', text:'수업에서 아이들과 활발히 대화하고 즉흥적으로 반응하는 것이 즐겁다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:2, dim:'EI', dir:'I', text:'수업 전에 혼자 조용히 준비하고 마음의 준비를 하는 시간이 꼭 필요하다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:3, dim:'EI', dir:'E', text:'갑자기 아이들이 엉뚱한 반응을 보여도 당황하지 않고 신나게 맞받아친다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:4, dim:'EI', dir:'I', text:'시끄럽고 활기찬 수업 후에는 혼자만의 회복 시간이 필요하다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:5, dim:'EI', dir:'E', text:'처음 만나는 학부모나 아이들에게 먼저 말을 걸고 분위기를 주도하는 편이다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  // PAGE 2: S/N
+  { id:6, dim:'SN', dir:'S', text:'수업 자료를 만들 때 폰트, 색깔, 레이아웃 디테일에 많은 시간을 쏟는다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:7, dim:'SN', dir:'N', text:'수업 중 아이들이 "왜요?"라고 물으면 철학적 토론으로 이어질 수 있어 좋다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:8, dim:'SN', dir:'S', text:'시도해보지 않은 새로운 활동보다 검증된 루틴을 따르는 것이 더 안심된다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:9, dim:'SN', dir:'N', text:'수업 주제와 전혀 관련 없는 아이디어가 튀어나와도 흥미롭게 연결하려 한다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:10, dim:'SN', dir:'S', text:'칠판 판서나 교실 환경이 정돈되어 있지 않으면 신경 쓰여 집중하기 어렵다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  // PAGE 3: T/F
+  { id:11, dim:'TF', dir:'T', text:'아이가 틀린 답을 말했을 때 기분보다 정확한 피드백을 주는 것이 먼저다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:12, dim:'TF', dir:'F', text:'울거나 힘들어하는 아이가 있으면 수업 진도보다 그 아이의 감정이 먼저 신경쓰인다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:13, dim:'TF', dir:'T', text:'수업 목표와 학습 성과를 명확히 설정하고 그것을 달성했는지 점검하는 편이다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:14, dim:'TF', dir:'F', text:'아이들이 나를 좋아해 주는 것이 수업 성과만큼, 혹은 그 이상으로 중요하게 느껴진다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:15, dim:'TF', dir:'T', text:'학부모와 상담할 때 현황을 객관적으로 전달하는 것이 감정적 공감보다 우선이다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  // PAGE 4: J/P
+  { id:16, dim:'JP', dir:'J', text:'수업 시작 전 당일 수업 계획을 다시 한 번 점검하지 않으면 불안하다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:17, dim:'JP', dir:'P', text:'계획대로 흘러가지 않는 수업도 상황에 따라 즐기며 흘러갈 수 있다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:18, dim:'JP', dir:'J', text:'수업 마무리 시 오늘 배운 내용을 정리해주고 다음 수업을 예고하는 루틴이 있다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:19, dim:'JP', dir:'P', text:'갑자기 생긴 빈 시간에 즉흥 게임이나 활동을 꺼내는 것이 전혀 어렵지 않다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:20, dim:'JP', dir:'J', text:'수업 자료는 사용 전날까지 완성되어 있어야 안정감이 생긴다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  // PAGE 5: Mixed
+  { id:21, dim:'EI', dir:'E', text:'수업 중 내 에너지가 올라갈수록 아이들도 따라 신나는 것이 느껴진다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:22, dim:'SN', dir:'N', text:'커리큘럼을 그대로 따르기보다 내가 직접 변형하고 응용하는 것을 즐긴다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:23, dim:'TF', dir:'F', text:'수업이 끝난 후 특정 아이의 표정이나 반응이 계속 마음에 남는 편이다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:24, dim:'JP', dir:'J', text:'수업 준비물 체크리스트나 수업 진행 순서를 적어두는 나만의 시스템이 있다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:25, dim:'EI', dir:'I', text:'단체보다는 소수 인원 수업이 나에게 더 맞는다고 느낀다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  // PAGE 6: Mixed
+  { id:26, dim:'SN', dir:'S', text:'수업 환경(교실 인테리어, 소품, 시각 자료)이 잘 갖춰져야 수업이 더 잘된다고 생각한다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:27, dim:'TF', dir:'T', text:'아이들에게 칭찬할 때도 구체적인 근거와 이유를 함께 말하는 편이다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:28, dim:'JP', dir:'P', text:'수업 계획서보다 현장 분위기에 맞춰 유연하게 바꾸는 것이 더 자연스럽다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:29, dim:'EI', dir:'E', text:'학부모 참관 수업처럼 관객이 있을 때 오히려 더 신나게 수업하는 편이다.', la:'전혀 아니다', lb:'매우 그렇다' },
+  { id:30, dim:'SN', dir:'N', text:'아이들이 영어를 단순 암기가 아닌, 진짜 언어로 느끼게 하고 싶다는 생각이 강하다.', la:'전혀 아니다', lb:'매우 그렇다' },
+];
+
+const PAGE_TITLES = [
+  '📝 에너지 & 상호작용 스타일',
+  '🎨 수업 준비 & 디테일 스타일',
+  '💬 피드백 & 감정 스타일',
+  '📅 계획 & 유연성 스타일',
+  '✨ 나의 강사 스타일 (종합 1)',
+  '🌟 나의 강사 스타일 (종합 2)',
+];
+
+const PAGES = [
+  [0,1,2,3,4],
+  [5,6,7,8,9],
+  [10,11,12,13,14],
+  [15,16,17,18,19],
+  [20,21,22,23,24],
+  [25,26,27,28,29],
+];
+
+// ============================================================
+// MBTI TYPES
+// ============================================================
+const MBTI_TYPES = {
+  ISTJ:{ name:'청렴결백한 관리자', emoji:'📋', comment:'체계적이고 책임감 넘치는 당신! 수업 준비부터 마무리까지 빈틈이 없어요. 아이들은 당신의 수업에서 안정감과 신뢰를 느낍니다.' },
+  ISFJ:{ name:'용감한 수호자', emoji:'🛡️', comment:'따뜻하고 헌신적인 당신! 아이 한 명 한 명을 세심하게 기억하고 챙겨주는 보살핌이 최고의 강점이에요.' },
+  INFJ:{ name:'선의의 옹호자', emoji:'🌙', comment:'깊은 통찰과 따뜻한 마음을 가진 당신! 아이들의 잠재력을 남보다 먼저 발견하는 특별한 안목이 있어요.' },
+  INTJ:{ name:'전략적 사령관', emoji:'♟️', comment:'장기적 시야와 완벽한 전략으로 수업을 설계하는 당신! 아이들의 성장 로드맵을 가장 잘 그려내는 강사예요.' },
+  ISTP:{ name:'만능 재주꾼', emoji:'🔧', comment:'냉철하면서도 실용적인 당신! 문제가 생겼을 때 가장 빠르게 해결책을 찾아내는 능력이 돋보여요.' },
+  ISFP:{ name:'호기심 많은 예술가', emoji:'🎨', comment:'감각적이고 따뜻한 당신! 아이들의 감정에 자연스럽게 공명하며 아름다운 수업 분위기를 만들어내요.' },
+  INFP:{ name:'열정적인 중재자', emoji:'🌸', comment:'이상과 가치를 중시하는 당신! 아이들의 꿈과 창의성을 진심으로 지지해주는 세상에서 가장 따뜻한 선생님이에요.' },
+  INTP:{ name:'논리적인 사색가', emoji:'🔭', comment:'지적 호기심이 가득한 당신! 영어를 단순 암기가 아닌 사고의 도구로 가르치는 특별한 능력이 있어요.' },
+  ESTP:{ name:'모험을 즐기는 사업가', emoji:'⚡', comment:'에너지 넘치고 즉흥적인 당신! 아이들과 순간순간 신나는 에너지로 교감하는 타고난 엔터테이너예요.' },
+  ESFP:{ name:'자유로운 연예인', emoji:'🎉', comment:'밝고 유쾌한 당신! 수업이 늘 파티처럼 느껴질 만큼 활기차고 재미있는 분위기를 만들어내는 능력이 있어요.' },
+  ENFP:{ name:'재기발랄한 활동가', emoji:'🌈', comment:'창의적이고 열정적인 당신! 아이들이 영어를 배우는 게 아니라 세상을 탐험하는 것처럼 느끼게 해주는 마법사예요.' },
+  ENTP:{ name:'뜨거운 논쟁을 즐기는 변론가', emoji:'💡', comment:'도전적이고 창의적인 당신! 아이들의 고정관념을 깨주고 생각을 확장시켜주는 지적 자극의 대가예요.' },
+  ESTJ:{ name:'엄격한 관리자', emoji:'📊', comment:'원칙과 효율을 중시하는 당신! 명확한 기준과 체계로 아이들에게 진짜 실력을 키워주는 믿음직한 강사예요.' },
+  ESFJ:{ name:'사교적인 외교관', emoji:'💝', comment:'따뜻하고 사교적인 당신! 아이들과 학부모 모두에게 사랑받는, 교실 전체를 화목하게 만드는 특별한 재능이 있어요.' },
+  ENFJ:{ name:'정의로운 사회운동가', emoji:'🌟', comment:'카리스마 넘치는 리더십의 당신! 아이들 하나하나의 잠재력을 이끌어내고 변화를 만들어내는 진정한 교육자예요.' },
+  ENTJ:{ name:'대담한 통솔자', emoji:'👑', comment:'비전과 결단력의 당신! 목표를 향해 아이들을 이끌고 최고의 결과를 만들어내는 타고난 리더예요.' },
+};
+
+// ============================================================
+// PERSONA DATA
+// ============================================================
+const PERSONAS = {
+  예쁨주의: {
+    cond: (mbti) => mbti.includes('S') && mbti.includes('J'),
+    emoji:'💄', color:'#FF8A80',
+    bg:'linear-gradient(135deg, #FFCDD2, #F8BBD0, #FCE4EC)',
+    name:'예쁨주의 강사',
+    badge:'VISUAL PERFECTIONIST',
+    desc:'교실이 예뻐야 수업이 산다! 비주얼과 완벽한 세팅에 진심인 당신은 아이들이 수업 공간 자체에서 설레도록 만드는 특별한 능력이 있어요. 자료 하나하나의 디테일에 신경 쓰고, 인스타감성 수업으로 학부모 신뢰도 UP!',
+    traits:['세팅 장인', '디테일 완벽주의', '시각 자료 최강', '루틴의 여왕/왕'],
+  },
+  유머주의: {
+    cond: (mbti) => mbti.includes('E') && mbti.includes('P'),
+    emoji:'😄', color:'#FFAB40',
+    bg:'linear-gradient(135deg, #FFE0B2, #FFCC80, #FFF9C4)',
+    name:'유머주의 강사',
+    badge:'ENERGY & FUN MASTER',
+    desc:'수업장 불꽃 에너지! 아이들이 깔깔대고 웃으면서도 어느새 영어를 배우고 있는 마법을 부리는 당신. 즉흥 개그, 몸개그, 엉뚱한 비유로 가장 기억에 남는 선생님이 되어요!',
+    traits:['즉흥의 달인', '에너지 폭발', '아이들 최애 선생님', '분위기 메이커'],
+  },
+  소심함주의: {
+    cond: (mbti) => mbti.includes('I') && mbti.includes('F'),
+    emoji:'🌿', color:'#80CBC4',
+    bg:'linear-gradient(135deg, #E0F2F1, #B2DFDB, #E8F5E9)',
+    name:'소심함주의 강사',
+    badge:'QUIET LEADER',
+    desc:'조용하지만 강한 당신! 시끄럽게 이끌지 않아도 섬세한 관찰력과 깊은 공감으로 아이들이 자연스럽게 따라오게 만드는 힘이 있어요. 작은 목소리로도 교실을 움직이는 진짜 리더예요.',
+    traits:['섬세한 관찰자', '깊은 공감', '1:1 최강', '안정된 분위기'],
+  },
+  공감주의: {
+    cond: (mbti) => mbti.includes('F') && mbti.includes('N'),
+    emoji:'💛', color:'#CE93D8',
+    bg:'linear-gradient(135deg, #F3E5F5, #E1BEE7, #EDE7F6)',
+    name:'공감주의 강사',
+    badge:'EMOTIONAL CONNECTOR',
+    desc:'아이들의 마음을 읽는 당신! 영어 실력보다 아이들의 감정과 몰입을 먼저 챙기는 선생님. 수업이 끝나도 그 따뜻한 기억이 오래 남아 아이들이 영어를 좋아하게 만드는 마법사예요.',
+    traits:['감정 감지 레이더', '몰입 유도', '스토리텔링 강자', '아이 중심 수업'],
+  },
+  교육주의: {
+    cond: (mbti) => mbti.includes('T') && mbti.includes('J'),
+    emoji:'📚', color:'#90CAF9',
+    bg:'linear-gradient(135deg, #E3F2FD, #BBDEFB, #E8EAF6)',
+    name:'교육주의 강사',
+    badge:'KNOWLEDGE ARCHITECT',
+    desc:'배움의 설계자 당신! 명확한 목표와 원칙 아래 체계적인 지식을 전달하는 것이 가장 큰 보람인 강사예요. 아이들의 실력을 데이터와 피드백으로 정확히 끌어올리는 학부모 신뢰도 1위!',
+    traits:['목표 명확', '체계적 설명', '피드백 마스터', '학부모 상담 최강'],
+  },
+};
+
+// ============================================================
+// ROUTINE TABLE DATA
+// ============================================================
+const ROUTINE_DATA = {
+  stages: [
+    { id:'warmup', icon:'☀️', name:'Warm-up' },
+    { id:'word', icon:'📖', name:'Word' },
+    { id:'mission', icon:'🎯', name:'Mission' },
+    { id:'teamgame', icon:'🏆', name:'Team Game' },
+    { id:'challenge', icon:'⚡', name:'Challenge' },
+    { id:'wrapup', icon:'🌙', name:'Wrap-up' },
+  ],
+  personas: {
+    예쁨주의: {
+      warmup:'예쁜 플래시카드나 테마별 PPT로 시각적 워밍업\n오늘의 분위기 세팅 (음악+데코)',
+      word:'예쁘게 디자인된 단어 카드 & 보드에 컬러 판서\n단어별 이미지 연상',
+      mission:'미션 카드를 직접 나눠주며 시각적 동기 부여\n예쁜 스탬프/스티커 보상',
+      teamgame:'팀 이름+팀 컬러 정해서 시각화\n점수판 실시간 이쁘게 업데이트',
+      challenge:'개인 챌린지 카드 배부\n예쁜 클리어 배지 수여',
+      wrapup:'오늘의 정리 슬라이드 보여주며 마무리\n"오늘도 수고했어요" 스탬프',
+    },
+    유머주의: {
+      warmup:'엉뚱한 질문으로 분위기 폭발\n선생님 몸개그 워밍업 댄스',
+      word:'단어마다 웃긴 에피소드나 비유 연결\n아이들과 즉흥 단어 연상 게임',
+      mission:'미션을 황당하게 과장해서 설명\n"이 미션 실패하면 선생님이 춤춤!" 등 즉흥 벌칙',
+      teamgame:'팀 이름을 아이들이 웃긴 걸로 직접 짓기\n감독관(선생님) 과장된 심판 역할극',
+      challenge:'챌린지에 황당한 조건 추가\n성공 시 온 반이 같이 이상한 세리머니',
+      wrapup:'"오늘 내가 제일 웃겼던 순간은?" 폭소 회고\n다음 시간 티저 예고 (호기심 자극)',
+    },
+    소심함주의: {
+      warmup:'잔잔한 음악과 함께 조용한 도입\n1:1로 눈 맞추며 오늘 기분 체크',
+      word:'작은 목소리로 찬찬히 설명\n아이가 먼저 읽어보도록 여백 주기',
+      mission:'미션 종이를 조용히 건네며 귓속말로 설명\n"넌 꼭 할 수 있어" 개인 응원',
+      teamgame:'소규모 팀으로 나눠 조용한 협력 게임\n과도한 경쟁보다 협동 강조',
+      challenge:'개인 도전으로 진행, 실패해도 괜찮은 분위기\n잘한 부분만 콕 집어 소근소근 칭찬',
+      wrapup:'오늘 잘한 아이 한 명씩 이름 불러 조용히 칭찬\n다음 시간을 기대하게 하는 힌트',
+    },
+    공감주의: {
+      warmup:'오늘 기분/날씨를 영어로 표현하며 감정 연결\n아이들 이야기 먼저 들어주기',
+      word:'단어와 연결된 감정/이야기로 도입\n"이 단어 들을 때 어떤 기분이야?" 질문',
+      mission:'미션의 스토리와 맥락을 충분히 설명\n아이들이 주인공이 되는 상황 설정',
+      teamgame:'팀원 감정 케어하며 진행\n모두가 참여할 수 있도록 배려',
+      challenge:'도전 전 "할 수 있어!" 감정 북돋우기\n실패해도 감정 공감 먼저',
+      wrapup:'"오늘 어떤 감정이었어?" 감정 언어로 마무리\n다음 수업 기대감 스토리로 예고',
+    },
+    교육주의: {
+      warmup:'지난 시간 복습 퀴즈로 학습 연속성 확인\n오늘 학습 목표 명시',
+      word:'어원/규칙과 함께 체계적 설명\n예문 3개 이상 제시 후 확인 문제',
+      mission:'미션 목표와 평가 기준 명확히 제시\n개인별 달성 여부 체크',
+      teamgame:'팀 경쟁에서 공정한 규칙 강조\n점수/데이터 기록 후 분석',
+      challenge:'난이도별 챌린지 제시\n정확도 기준으로 통과 여부 판단',
+      wrapup:'오늘 배운 내용 핵심 정리 3가지\n다음 수업 예습 포인트 안내',
+    },
+  }
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let currentPage = 0;
+let answers = {};
+
+function startQuiz() {
+  document.getElementById('splash').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  renderPage();
+}
+
+function renderPage() {
+  const indices = PAGES[currentPage];
+  document.getElementById('page-title').textContent = PAGE_TITLES[currentPage];
+  const pct = Math.round((currentPage / PAGES.length) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${currentPage+1} / ${PAGES.length} 페이지`;
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('btn-prev').style.display = currentPage > 0 ? 'block' : 'none';
+
+  const isLast = currentPage === PAGES.length - 1;
+  document.getElementById('btn-next').textContent = isLast ? '결과 보기 🌸' : '다음 →';
+
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+  indices.forEach((qi, i) => {
+    const q = QUESTIONS[qi];
+    const saved = answers[q.id] || null;
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.innerHTML = `
+      <div class="q-num">Q${q.id}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="scale-row">
+        <div class="scale-label">${q.la}</div>
+        <div class="scale-btns" id="btns-${q.id}">
+          ${[1,2,3,4,5].map(v=>`<button class="scale-btn${saved===v?' selected':''}" onclick="selectAnswer(${q.id},${v},this)">${v}</button>`).join('')}
+        </div>
+        <div class="scale-label">${q.lb}</div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+  updateNextBtn();
+}
+
+function selectAnswer(qid, val, btn) {
+  answers[qid] = val;
+  const btns = document.querySelectorAll(`#btns-${qid} .scale-btn`);
+  btns.forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  updateNextBtn();
+}
+
+function updateNextBtn() {
+  const indices = PAGES[currentPage];
+  const allAnswered = indices.every(qi => answers[QUESTIONS[qi].id]);
+  document.getElementById('btn-next').disabled = !allAnswered;
+}
+
+function nextPage() {
+  if (currentPage < PAGES.length - 1) {
+    currentPage++;
+    renderPage();
+    window.scrollTo(0,0);
+  } else {
+    showResult();
+  }
+}
+
+function prevPage() {
+  if (currentPage > 0) {
+    currentPage--;
+    renderPage();
+    window.scrollTo(0,0);
+  }
+}
+
+// ============================================================
+// SCORING
+// ============================================================
+function calcMBTI() {
+  let scores = { EI: 0, SN: 0, TF: 0, JP: 0 };
+  let counts = { EI: 0, SN: 0, TF: 0, JP: 0 };
+
+  QUESTIONS.forEach(q => {
+    const val = answers[q.id];
+    if (!val) return;
+    counts[q.dim]++;
+    if (q.dir === 'E' || q.dir === 'S' || q.dir === 'T' || q.dir === 'J') {
+      scores[q.dim] += val;
+    } else {
+      scores[q.dim] += (6 - val); // reverse for I,N,F,P
+    }
+  });
+
+  const avg = dim => counts[dim] ? scores[dim] / counts[dim] : 3;
+  const e = avg('EI') > 3 ? 'E' : 'I';
+  const s = avg('SN') > 3 ? 'S' : 'N';
+  const t = avg('TF') > 3 ? 'T' : 'F';
+  const j = avg('JP') > 3 ? 'J' : 'P';
+  return { mbti: e+s+t+j, raw: { EI: avg('EI'), SN: avg('SN'), TF: avg('TF'), JP: avg('JP') } };
+}
+
+function getPersona(mbti) {
+  for (const [key, p] of Object.entries(PERSONAS)) {
+    if (p.cond(mbti)) return { key, ...p };
+  }
+  // fallback
+  if (mbti.includes('T') && mbti.includes('J')) return { key:'교육주의', ...PERSONAS['교육주의'] };
+  if (mbti.includes('F') && mbti.includes('N')) return { key:'공감주의', ...PERSONAS['공감주의'] };
+  if (mbti.includes('E')) return { key:'유머주의', ...PERSONAS['유머주의'] };
+  return { key:'소심함주의', ...PERSONAS['소심함주의'] };
+}
+
+// ============================================================
+// RESULT RENDER
+// ============================================================
+function showResult() {
+  document.getElementById('quiz').style.display = 'none';
+  const result = document.getElementById('result');
+  result.style.display = 'block';
+
+  const { mbti } = calcMBTI();
+  const typeData = MBTI_TYPES[mbti] || MBTI_TYPES['ENFP'];
+  const persona = getPersona(mbti);
+
+  // Build routine table
+  const stages = ROUTINE_DATA.stages;
+  const personaNames = Object.keys(ROUTINE_DATA.personas);
+  const myPersona = persona.key;
+
+  const tableHTML = `
+    <div class="routine-wrap">
+      <table class="routine-table">
+        <thead>
+          <tr>
+            <th class="stage-header">수업 단계</th>
+            ${personaNames.map(p => `<th class="persona-col${p===myPersona?' highlight-col':''}">${PERSONAS[p].emoji} ${p}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${stages.map(s => `
+            <tr>
+              <td class="stage-cell"><span class="stage-icon">${s.icon}</span>${s.name}</td>
+              ${personaNames.map(p => `
+                <td class="${p===myPersona?'highlight-col':''}">
+                  ${(ROUTINE_DATA.personas[p][s.id]||'').replace(/\n/g,'<br>')}
+                </td>
+              `).join('')}
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  // TIPS
+  const TIPS = {
+    예쁨주의: [
+      { c:'#F48FB1', title:'💡 최고의 순간', text:'완벽하게 세팅된 교실에서 아이들이 "와!" 하고 감탄할 때. 시각 자료 하나로 수업의 몰입도가 달라져요.' },
+      { c:'#CE93D8', title:'⚠️ 주의할 점', text:'세팅에 너무 많은 에너지를 써서 정작 수업 내용 준비가 부족할 수 있어요. 80% 완성으로도 충분해요!' },
+      { c:'#80DEEA', title:'🚀 성장 포인트', text:'루틴을 한번 만들면 매주 재활용 가능! 예쁜 템플릿 시스템을 만들어두면 시간 절약 + 퀄리티 유지.' },
+      { c:'#A5D6A7', title:'💬 학부모 소통 팁', text:'수업 사진을 찍어 공유하면 학부모 신뢰도 폭발! 비주얼이 강점이라 SNS 마케팅도 자연스럽게 돼요.' },
+    ],
+    유머주의: [
+      { c:'#FFAB40', title:'💡 최고의 순간', text:'아이들이 깔깔거리며 웃으면서도 어느새 영어를 유창하게 말하고 있을 때. 웃음이 최고의 학습 환경이에요.' },
+      { c:'#FF7043', title:'⚠️ 주의할 점', text:'수업이 너무 재미있기만 하면 학부모가 "공부를 제대로 하는 건지" 걱정할 수도 있어요. 성과 보고를 잊지 마세요!' },
+      { c:'#26C6DA', title:'🚀 성장 포인트', text:'유머를 학습 목표와 연결하는 연습! "이 단어로 웃긴 문장 만들기" 같은 미션이 학습과 재미를 동시에 잡아요.' },
+      { c:'#66BB6A', title:'💬 학부모 소통 팁', text:'"오늘 수업에서 아이가 어떤 걸 배웠는지" 구체적으로 전달하면 신뢰도 UP. 재미 + 성과 두 마리 토끼를 잡아요!' },
+    ],
+    소심함주의: [
+      { c:'#80CBC4', title:'💡 최고의 순간', text:'조용한 아이가 처음으로 손을 들고 답을 말했을 때. 섬세한 배려가 아이를 성장시키는 특별한 순간이에요.' },
+      { c:'#CE93D8', title:'⚠️ 주의할 점', text:'너무 조심스럽게 수업하면 아이들이 에너지를 발산하지 못할 수 있어요. 가끔은 의도적으로 떠들썩한 활동도 넣어보세요!' },
+      { c:'#FFB74D', title:'🚀 성장 포인트', text:'1:1 강점을 살려 개별 피드백 시스템 만들기! 각 아이의 성장 노트를 쓰면 학부모 상담에서 빛나요.' },
+      { c:'#90CAF9', title:'💬 학부모 소통 팁', text:'"아이 한 명 한 명을 기억한다"는 것을 보여주는 것이 최고의 신뢰 전략. 이름+특징을 언급하면 바로 마음이 열려요.' },
+    ],
+    공감주의: [
+      { c:'#CE93D8', title:'💡 최고의 순간', text:'아이가 "선생님 수업이 제일 좋아요"라고 말할 때. 감정적 연결이 영어 학습 동기를 만들어내는 비결이에요.' },
+      { c:'#F48FB1', title:'⚠️ 주의할 점', text:'아이 감정에 너무 집중하다 보면 수업 진도가 느려질 수 있어요. 공감과 진도 사이의 균형을 찾는 것이 과제예요.' },
+      { c:'#80DEEA', title:'🚀 성장 포인트', text:'감정을 영어와 연결하는 수업 설계가 강점! "How do you feel today?" 루틴이 언어 습득과 감정 표현을 동시에 키워요.' },
+      { c:'#A5D6A7', title:'💬 학부모 소통 팁', text:'"오늘 아이가 정말 즐겁게 참여했어요"라는 구체적 이야기가 감동을 줘요. 감정 중심 피드백이 최고의 무기예요.' },
+    ],
+    교육주의: [
+      { c:'#90CAF9', title:'💡 최고의 순간', text:'아이가 처음 못 하던 것을 완벽하게 해냈을 때. 데이터로 증명되는 성장이 가장 큰 보람이에요.' },
+      { c:'#F48FB1', title:'⚠️ 주의할 점', text:'너무 원칙 중심이면 아이들이 부담을 느낄 수 있어요. 가끔은 결과보다 과정을 칭찬하는 여유도 필요해요.' },
+      { c:'#FFAB40', title:'🚀 성장 포인트', text:'체계적인 피드백 시트를 만들어두면 학부모 상담이 훨씬 수월해져요. 데이터가 신뢰를 만들어요.' },
+      { c:'#80CBC4', title:'💬 학부모 소통 팁', text:'"이번 달 ○○이의 성장 포인트는 이것이에요"처럼 구체적인 성과 리포트가 학부모를 열렬한 팬으로 만들어요.' },
+    ],
+  };
+
+  const tips = TIPS[myPersona] || TIPS['교육주의'];
+  const tipsHTML = `<div class="tips-grid">${tips.map(t=>`
+    <div class="tip-card" style="border-top-color:${t.c}">
+      <h4>${t.title}</h4>
+      <p>${t.text}</p>
+    </div>
+  `).join('')}</div>`;
+
+  result.innerHTML = `
+    <div class="result-header">
+      <div class="result-emoji">${typeData.emoji}</div>
+      <div class="result-mbti">${mbti}</div>
+      <div class="result-type-name">${typeData.name}</div>
+      <div class="result-comment">${typeData.comment}</div>
+    </div>
+
+    <h2 class="section-title">🎭 나의 티칭 페르소나</h2>
+    <div class="persona-card" style="background:${persona.bg}; color:${persona.color.replace('#','') > '888888' ? '#3E2723' : '#3E2723'}">
+      <span class="persona-badge">${persona.badge}</span>
+      <span class="persona-emoji">${persona.emoji}</span>
+      <div class="persona-name" style="color:#3E2723">${persona.name}</div>
+      <div class="persona-desc" style="color:#5D4037">${persona.desc}</div>
+      <div class="persona-traits">
+        ${persona.traits.map(t=>`<span class="persona-trait">${t}</span>`).join('')}
+      </div>
+    </div>
+
+    <h2 class="section-title">📅 나에게 딱 맞는 수업 루틴 전략표</h2>
+    <p style="text-align:center;color:#B0A0A0;font-size:13px;margin-bottom:16px">컬러 강조 열이 나의 페르소나예요! (좌우 스크롤 가능)</p>
+    ${tableHTML}
+
+    <h2 class="section-title">💡 페르소나별 성장 가이드</h2>
+    ${tipsHTML}
+
+    <button class="btn-retry" onclick="retryQuiz()">🔄 다시 진단하기</button>
+  `;
+
+  window.scrollTo(0, 0);
+}
+
+function retryQuiz() {
+  answers = {};
+  currentPage = 0;
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('splash').style.display = 'flex';
+}
+</script>
+</body>
+</html>
