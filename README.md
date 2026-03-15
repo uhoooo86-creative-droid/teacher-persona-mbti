@@ -1,1 +1,2 @@
-teacher-persona-mbti
+# MBTI for Teacher
+Big Cat's test for teacher
