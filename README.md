@@ -1,1 +1,1 @@
-# Teacher persona MBTI
+# teacher-persona-mbti
